@@ -7,9 +7,9 @@ class TeamAssigner:
     
     def model(self,image):
 
-        image_2d = image.reshape(-1,3)
+        image = image.reshape(-1,3)
         kmeans = KMeans(n_clusters=2, init="k-means++",n_init=1)
-        kmeans.fit(image_2d)
+        kmeans.fit(image)
         return kmeans
     
     def jerseyColour(self, frame, bbox):
@@ -45,7 +45,7 @@ class TeamAssigner:
         # As at a time only two teams can be formed, 
         # we can use KMeans to cluster jersey colour (avoiding different colours for same team members).
 
-        kmeans = KMeans(n_clusters=2, init="k-means++",n_init=1)
+        kmeans = KMeans(n_clusters=2, init="k-means++",n_init=10)
         kmeans.fit(jersey_colours)
         
         self.kmeans = kmeans
