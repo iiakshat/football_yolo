@@ -27,13 +27,13 @@ class Tracker:
         # hence we use .predict() here, and tracker from another library: supervision.
 
         for i in range(0, len(frames), batch_size):
-            results.extend(self.model.predict(frames[i:i+batch_size], conf=0.1))
+            results += self.model.predict(frames[i:i+batch_size], conf=0.1)
         return results
     
 
     def track(self, frames, cache=False, path=None):
 
-        if cache and path and os.path.exists(path):
+        if cache and path is not None and os.path.exists(path):
             with open(path, "rb") as f:
                 tracks = pickle.load(f)
             return tracks
