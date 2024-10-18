@@ -61,7 +61,7 @@ class TeamAssigner:
         teamid = self.kmeans.predict(jerseycolor.reshape(1,-1))[0]
         teamid += 1
 
-        if playerid == 91:
+        if playerid == 104:
             teamid = 1
             
         self.team[playerid] = teamid
