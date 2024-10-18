@@ -166,7 +166,25 @@ class Tracker:
         return frame
 
 
-    def draw_annotations(self, frames, tracks):
+    def team_control(self, frame, frame_num, team_ball_control):
+
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (1350, 850), (1900, 970), (255,255,255), -1)
+        alpha = 0.4
+        cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+
+        tillframe = team_ball_control[:frame_num+1]
+        team1 = tillframe[tillframe==1].shape[0]
+        team2 = tillframe[tillframe==2].shape[0]
+        team_1 = team1/(team1+team2)
+        team_2 = team2/(team1+team2)
+
+        cv2.putText(frame, f"Team 1: {team_1*100:.2f}%", (1400, 900), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 3)
+        cv2.putText(frame, f"Team 2: {team_2*100:.2f}%", (1400, 950), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 3)
+
+        return frame
+
+    def draw_annotations(self, frames, tracks, team_ball_control):
 
         op_frames = []
         
@@ -194,6 +212,8 @@ class Tracker:
             for _, ball_ in ball.items():
                 frame = self.triangle(frame, ball_["bbox"],(0,255,0))
 
+            # Team Control
+            frame = self.team_control(frame, i, team_ball_control)
             op_frames.append(frame)
 
         return op_frames
