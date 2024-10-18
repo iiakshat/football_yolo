@@ -20,13 +20,12 @@ def read_video(video_path):
 
     while True:
         ret, frame = cap.read()
-        if ret:
-            frames.append(frame)
-        else:
+        if not ret:
             break
+        frames.append(frame)
+
     cap.release()
     np.savez_compressed(cache_file, *frames)
-
     return frames
 
 
