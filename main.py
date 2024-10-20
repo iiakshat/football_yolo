@@ -7,7 +7,7 @@ import time
 
 def main():
 
-    s = time.perf_counter()
+    # s = time.perf_counter()
     input_path = 'matches/vid1.mp4'
     output_path = 'output/vid1.avi'
     frames = read_video(input_path)
@@ -46,7 +46,7 @@ def main():
     team_ball = np.array(team_ball)
     result  = tracker.draw_annotations(frames, tracks, team_ball)
     save_video(result, output_path)
-    print(f"Time: {time.perf_counter() - s}")
+    # print(f"Time: {time.perf_counter() - s}")
 
 if __name__ == '__main__':
     main()
