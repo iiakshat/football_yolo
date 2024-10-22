@@ -3,6 +3,7 @@ from ultralytics import YOLO
 model = YOLO("models/best.pt")
 
 result = model.predict("matches/vid1.mp4", save=True)
+
 print(result[0])
 print("+" * 150)
 
