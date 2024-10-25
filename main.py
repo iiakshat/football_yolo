@@ -19,6 +19,15 @@ def main():
                             cache=True,
                             path='models/trained.pkl')
     
+    tracker.handle_position(tracks)
+
+    movement_estimator = CameraMovementEstimator(frames[0])
+    movement_per_frame = movement_estimator.estimate_movement(frames, 
+                                                              cache=True, 
+                                                              path='models/movement.pkl')
+
+    movement_estimator.adjust_positions(tracks, movement_per_frame)
+    
     tracks["ball"] = tracker.interpolate_ball(tracks["ball"])
 
     assigner = TeamAssigner()
@@ -46,8 +55,10 @@ def main():
             team_ball.append(team_ball[-1])
         
     team_ball = np.array(team_ball)
-    result  = tracker.draw_annotations(frames, tracks, team_ball)
-    save_video(result, output_path)
+    output_video  = tracker.draw_annotations(frames, tracks, team_ball)
+    output_video = movement_estimator.draw_movement(output_video, movement_per_frame)
+
+    save_video(output_video, output_path)
     # print(f"Time: {time.perf_counter() - s}")
 
 if __name__ == '__main__':
