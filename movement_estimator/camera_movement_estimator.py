@@ -29,6 +29,16 @@ class CameraMovementEstimator:
             mask = mask_features
         )
 
+    def adjust_positions(self, tracks, movement_per_frame):
+         
+        for object, object_track in tracks.items():
+            for frame_num, track in enumerate(object_track):
+                for track_id, track_details in track.items():
+                    position = track_details["position"]
+                    movement = movement_per_frame[frame_num]
+                    position_adjusted = (position[0] - movement[0], position[1] - movement[1])
+                    tracks[object][frame_num][track_id]["position_adjusted"] = position_adjusted
+
     def estimate_movement(self, frames, cache=False, path=None):
         
         if cache and path and os.path.exists(path):
@@ -36,7 +46,7 @@ class CameraMovementEstimator:
                 movement = pickle.load(f)
             return movement
         
-        movement = [[0,0]* len(frames)]
+        movement = [[0,0]]* len(frames)
         gray = cv2.cvtColor(frames[0], cv2.COLOR_BGR2GRAY)
         features = cv2.goodFeaturesToTrack(gray, **self.features)
 
@@ -69,3 +79,21 @@ class CameraMovementEstimator:
                 pickle.dump(movement, f)
 
         return movement
+
+    def draw_movement(self, frames, movement_per_frame):
+
+        output = []
+        alpha = 0.6
+        for frame_num, frame in enumerate(frames):
+            overlay = frame.copy()
+            frame = frame.copy()
+            cv2.rectangle(overlay, (20,20), (200, 95), (255,255,255), -1)
+            cv2.addWeighted(overlay, alpha, frame, 1-alpha, 0, frame)
+
+            movement_x, movement_y = movement_per_frame[frame_num]
+            frame = cv2.putText(frame, f"X: {movement_x:.2f}", (30, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 3)
+            frame = cv2.putText(frame, f"Y: {movement_y:.2f}", (30, 80), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 3)
+
+            output.append(frame)
+        
+        return output

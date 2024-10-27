@@ -1,1 +1,2 @@
 from .camera_movement_estimator import CameraMovementEstimator
+from .speed_estimator import SpeedDistanceEstimator
