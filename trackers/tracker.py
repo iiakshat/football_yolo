@@ -31,6 +31,115 @@ class Tracker:
         return results
     
 
+    def interpolate_ball(self, position):
+
+        position = [pos.get(1,{}).get("bbox", []) for pos in position]
+        df = pd.DataFrame(position, columns=["x1", "y1", "x2", "y2"])
+        df = df.interpolate().bfill()
+        return [{1: {"bbox": x}} for x in df.to_numpy().tolist()]
+
+
+    def ellipse(self,frame,bbox,color,track_id=None):
+        y2 = int(bbox[3])
+        x_center, _ = bbox_center(bbox)
+        width = bbox_width(bbox)
+
+        cv2.ellipse(
+            frame,
+            center=(x_center,y2),
+            axes=(int(width), int(0.35*width)),
+            angle=0.0,
+            startAngle=-45,
+            endAngle=235,
+            color = color,
+            thickness=2,
+            lineType=cv2.LINE_4
+        )
+
+        rectangle_width = 40
+        rectangle_height=20
+        x1_rect = x_center - rectangle_width//2
+        x2_rect = x_center + rectangle_width//2
+        y1_rect = (y2- rectangle_height//2) +15
+        y2_rect = (y2+ rectangle_height//2) +15
+
+        if track_id is not None:
+            cv2.rectangle(frame,
+                          (int(x1_rect),int(y1_rect) ),
+                          (int(x2_rect),int(y2_rect)),
+                          color,
+                          cv2.FILLED)
+            
+            x1_text = x1_rect+12
+            if track_id > 99:
+                x1_text -=10
+            
+            cv2.putText(
+                frame,
+                f"{track_id}",
+                (int(x1_text),int(y1_rect+15)),
+                cv2.FONT_HERSHEY_DUPLEX,
+                0.6,
+                (0,0,0),
+                2
+            )
+
+        return frame
+    
+
+    def triangle(self,frame,bbox,color):
+        y= int(bbox[1])
+        x,_ = bbox_center(bbox)
+
+        triangle_points = np.array([
+            [x,y],
+            [x-10,y-20],
+            [x+10,y-20],
+        ])
+        cv2.drawContours(frame, [triangle_points],0,color, cv2.FILLED)
+        cv2.drawContours(frame, [triangle_points],0,(0,0,0), 2)
+
+        return frame
+
+
+    def draw_annotations(self, frames, tracks, team_ball_control):
+
+        op_frames = []
+        
+        # Draw frame by frame
+        for i, frame in enumerate(frames):
+            frame = frame.copy()
+            players = tracks["players"][i]
+            referees = tracks["referees"][i]
+            ball = tracks["ball"][i]
+
+            # Draw Player
+            for track_id, player in players.items():
+
+                color = player.get("jersey_colour", (0,0,255))
+                frame = self.ellipse(frame, player["bbox"], color, track_id)
+
+                if player.get("has_ball", False):
+                    frame = self.player_with_ball(frame, track_id)
+                    frame = self.triangle(frame, player["bbox"],(0,0,255))
+                else:
+                    frame = self.player_with_ball(frame, None)
+
+            # Draw Referee
+            for _, referee in referees.items():
+                frame = self.ellipse(frame, referee["bbox"],(0,255,255))
+            
+            # Draw ball 
+            for _, ball_ in ball.items():
+                frame = self.triangle(frame, ball_["bbox"],(0,255,0))
+
+            # Team Control
+            frame = self.team_control(frame, i, team_ball_control)
+            op_frames.append(frame)
+
+        return op_frames
+    
+
     def track(self, frames, cache=False, path=None):
 
         if cache and path is not None and os.path.exists(path):
@@ -96,80 +205,10 @@ class Tracker:
         return tracks
     
 
-    def interpolate_ball(self, position):
-
-        position = [pos.get(1,{}).get("bbox", []) for pos in position]
-        df = pd.DataFrame(position, columns=["x1", "y1", "x2", "y2"])
-        df = df.interpolate().bfill()
-        return [{1: {"bbox": x}} for x in df.to_numpy().tolist()]
-
-    def ellipse(self,frame,bbox,color,track_id=None):
-        y2 = int(bbox[3])
-        x_center, _ = bbox_center(bbox)
-        width = bbox_width(bbox)
-
-        cv2.ellipse(
-            frame,
-            center=(x_center,y2),
-            axes=(int(width), int(0.35*width)),
-            angle=0.0,
-            startAngle=-45,
-            endAngle=235,
-            color = color,
-            thickness=2,
-            lineType=cv2.LINE_4
-        )
-
-        rectangle_width = 40
-        rectangle_height=20
-        x1_rect = x_center - rectangle_width//2
-        x2_rect = x_center + rectangle_width//2
-        y1_rect = (y2- rectangle_height//2) +15
-        y2_rect = (y2+ rectangle_height//2) +15
-
-        if track_id is not None:
-            cv2.rectangle(frame,
-                          (int(x1_rect),int(y1_rect) ),
-                          (int(x2_rect),int(y2_rect)),
-                          color,
-                          cv2.FILLED)
-            
-            x1_text = x1_rect+12
-            if track_id > 99:
-                x1_text -=10
-            
-            cv2.putText(
-                frame,
-                f"{track_id}",
-                (int(x1_text),int(y1_rect+15)),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.6,
-                (0,0,0),
-                2
-            )
-
-        return frame
-    
-
-    def triangle(self,frame,bbox,color):
-        y= int(bbox[1])
-        x,_ = bbox_center(bbox)
-
-        triangle_points = np.array([
-            [x,y],
-            [x-10,y-20],
-            [x+10,y-20],
-        ])
-        cv2.drawContours(frame, [triangle_points],0,color, cv2.FILLED)
-        cv2.drawContours(frame, [triangle_points],0,(0,0,0), 2)
-
-        return frame
-
-
     def team_control(self, frame, frame_num, team_ball_control):
 
         overlay = frame.copy()
-        cv2.rectangle(overlay, (1350, 850), (1900, 970), (255,255,255), -1)
+        cv2.rectangle(overlay, (1350, 950), (1850, 1070), (255,255,255), -1)
         alpha = 0.4
         cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
 
@@ -179,41 +218,38 @@ class Tracker:
         team_1 = team1/(team1+team2)
         team_2 = team2/(team1+team2)
 
-        cv2.putText(frame, f"Team 1: {team_1*100:.2f}%", (1400, 900), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 3)
-        cv2.putText(frame, f"Team 2: {team_2*100:.2f}%", (1400, 950), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,0), 3)
+        cv2.putText(frame, f"Team 1: {team_1*100:.2f}%", (1400, 1000), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 3)
+        cv2.putText(frame, f"Team 2: {team_2*100:.2f}%", (1400, 1050), cv2.FONT_HERSHEY_DUPLEX, 1, (0,0,0), 3)
+
+        return frame
+    
+
+    def player_with_ball(self, frame, trackid):
+
+        if trackid is None:
+            text = " No one has the ball."
+        else:
+            text = f"Player {trackid} has the ball."
+
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (750, 980), (1300, 1050), (0,0,0), -1)
+        alpha = 0.4
+        cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+        cv2.putText(frame, text, (790, 1030), cv2.FONT_HERSHEY_DUPLEX, 1, (255,255,255), 3)
 
         return frame
 
-    def draw_annotations(self, frames, tracks, team_ball_control):
 
-        op_frames = []
-        
-        # Draw frame by frame
-        for i, frame in enumerate(frames):
-            frame = frame.copy()
-            players = tracks["players"][i]
-            referees = tracks["referees"][i]
-            ball = tracks["ball"][i]
-
-            # Draw Player
-            for track_id, player in players.items():
-
-                color = player.get("jersey_colour", (0,0,255))
-                frame = self.ellipse(frame, player["bbox"], color, track_id)
-
-                if player.get("has_ball", False):
-                    frame = self.triangle(frame, player["bbox"],(0,0,255))
+    def handle_position(self, tracks):
+        for object, object_track in tracks.items():
+            for frame_num, track in enumerate(object_track):
+                for track_id, track_details in track.items():
                     
-            # Draw Referee
-            for _, referee in referees.items():
-                frame = self.ellipse(frame, referee["bbox"],(0,255,255))
-            
-            # Draw ball 
-            for _, ball_ in ball.items():
-                frame = self.triangle(frame, ball_["bbox"],(0,255,0))
+                    bbox = track_details["bbox"]
+                    if object == "ball":
+                        position = bbox_center(bbox)
+                    else:
+                        position = foot_position(bbox)
 
-            # Team Control
-            frame = self.team_control(frame, i, team_ball_control)
-            op_frames.append(frame)
-
-        return op_frames
+                    tracks[object][frame_num][track_id]["position"] = position
+                
