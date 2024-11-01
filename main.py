@@ -2,10 +2,12 @@ import os
 import cv2
 import time
 import numpy as np
+import pandas as pd
 from trackers import Tracker
 from utils import read_video, save_video
 from assignment import TeamAssigner, BallAssigner
-from movement_estimator import CameraMovementEstimator
+from movement_estimator import CameraMovementEstimator, SpeedDistanceEstimator
+from transformer import ViewTransformer
 
 def main():
 
@@ -28,7 +30,13 @@ def main():
 
     movement_estimator.adjust_positions(tracks, movement_per_frame)
     
+    viewtransformer = ViewTransformer()
+    viewtransformer.add_positions(tracks)
+
     tracks["ball"] = tracker.interpolate_ball(tracks["ball"])
+
+    speedDistEstimator = SpeedDistanceEstimator()
+    speedDistEstimator.estimate_dist_and_speed(tracks)
 
     assigner = TeamAssigner()
     assigner.assign_colour(frames[0], tracks["players"][0])
@@ -57,7 +65,8 @@ def main():
     team_ball = np.array(team_ball)
     output_video  = tracker.draw_annotations(frames, tracks, team_ball)
     output_video = movement_estimator.draw_movement(output_video, movement_per_frame)
-
+    output_video = speedDistEstimator.draw_annotations(output_video, tracks)
+    
     save_video(output_video, output_path)
     # print(f"Time: {time.perf_counter() - s}")
 
