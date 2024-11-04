@@ -114,7 +114,7 @@ YOLO model was fine-tuned on a football dataset to classify objects more accurat
 ![F1_curve](https://github.com/user-attachments/assets/dbea5803-5267-47ac-857a-1082c444805e)
 ![PR_curve](https://github.com/user-attachments/assets/435b17d0-4414-429b-b672-d767b5f30cbb)
 
-**Note**: Due to lack of samples, PR and F1 Score for ball and background seems to very less than expected.
+**Note**: Due to lack of samples, PR and F1 Score for ball is very low.
 
 
 ## Contributions
