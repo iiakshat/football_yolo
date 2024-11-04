@@ -6,8 +6,20 @@
 [![GitHub stars](https://img.shields.io/github/stars/iiakshat/football_yolo.svg)](https://github.com/iiakshat/football_yolo/stargazers)
 [![GitHub license](https://img.shields.io/github/license/iiakshat/football_yolo.svg)](https://github.com/iiakshat/football_yolo/blob/main/LICENSE)
 
+## Table of Contents
+- [Description](#description)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Project Structure](#project-structure)
+- [Input & Output](#input--output)
+- [Setup Instructions](#setup-instructions)
+- [Usage](#usage)
+- [Model Performance & Evaluation](#model-performance--evaluation)
+- [Contributions](#contributions)
+
 ## Description
-The __Football Match Analysis Using YOLO__ project is an AI-powered system designed to analyze football match videos in real-time, extracting player positions, speeds, and distances covered. By leveraging YOLO for object detection, this project assigns team colors, tracks ball possession, and adjusts camera movements to provide a comprehensive view of player performance and match dynamics.
+The __Football Match Analysis Using YOLO__ project is an AI-powered system designed to analyze football match videos, extracting player positions, speeds, and distances covered. By leveraging YOLO for object detection and roboflow [football dataset](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc/dataset/1) for fine-tuning, this project assigns team colors, tracks ball possession, and adjusts camera movements to provide a comprehensive view of player performance and match dynamics.
+
 
 ## Features
 - __Player Tracking and Team Assignment:__ Detects players and assigns them to teams based on jersey color.
@@ -89,6 +101,21 @@ pip install -r requirements.txt
 python main.py
 ```
 2. Check Output folder.
+
+## Model Performance & Evaluation
+YOLO model was fine-tuned on a football dataset to classify objects more accurately.
+
+**Dataset**: [Football Dataset](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc/dataset/1)
+- __Confusion Matrix__
+  ![confusion_matrix](https://github.com/user-attachments/assets/01c7907e-db6b-4f5f-acdc-fe738bb3c815)
+
+- __F1 & Confidence and Precision & Recall Curve__
+
+![F1_curve](https://github.com/user-attachments/assets/dbea5803-5267-47ac-857a-1082c444805e)
+![PR_curve](https://github.com/user-attachments/assets/435b17d0-4414-429b-b672-d767b5f30cbb)
+
+**Note**: Due to lack of samples, PR and F1 Score for ball and background seems to very less than expected.
+
 
 ## Contributions
 
