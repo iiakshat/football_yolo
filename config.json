@@ -1,0 +1,20 @@
+{   
+    "model" : "models/best.pt",
+    "output_path" : "output/vid1.avi",
+    "input_path" : "matches/vid1.mp4",
+    "cache" : 1,
+    "frame_rate" : 24,
+    "movementpath" : "models/movement.pkl",
+    "trackpath" : "models/trained.pkl",
+    "alpha" : 0.5,
+    "show_speed" : 1,
+    "show_distance" : 1,
+    "show_team_control" : 1,
+    "show_player_with_ball" : 1,
+    "show_player_id_with_ball" : 1,
+    "min_distance_to_assign_ball" : 70,
+    "court_width" : 68,
+    "court_length" : 105,
+    "court_divisons" : 18,
+    "division_length" : 5.834
+}
