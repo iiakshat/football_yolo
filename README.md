@@ -6,6 +6,10 @@
 [![GitHub stars](https://img.shields.io/github/stars/iiakshat/football_yolo.svg)](https://github.com/iiakshat/football_yolo/stargazers)
 [![GitHub license](https://img.shields.io/github/license/iiakshat/football_yolo.svg)](https://github.com/iiakshat/football_yolo/blob/main/LICENSE)
 
+## Description
+The __Football Match Analysis Using YOLO__ project is an AI-powered system designed to analyze football match videos, extracting player positions, speeds, and distances covered. By leveraging YOLO for object detection and roboflow [football dataset](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc/dataset/1) for fine-tuning, this project assigns team colors, tracks ball possession, and adjusts camera movements to provide a comprehensive view of player performance and match dynamics.
+
+
 ## Table of Contents
 - [Description](#description)
 - [Features](#features)
@@ -16,10 +20,6 @@
 - [Usage](#usage)
 - [Model Performance & Evaluation](#model-performance--evaluation)
 - [Contributions](#contributions)
-
-## Description
-The __Football Match Analysis Using YOLO__ project is an AI-powered system designed to analyze football match videos, extracting player positions, speeds, and distances covered. By leveraging YOLO for object detection and roboflow [football dataset](https://universe.roboflow.com/roboflow-jvuqo/football-players-detection-3zvbc/dataset/1) for fine-tuning, this project assigns team colors, tracks ball possession, and adjusts camera movements to provide a comprehensive view of player performance and match dynamics.
-
 
 ## Features
 - __Player Tracking and Team Assignment:__ Detects players and assigns them to teams based on jersey color.
