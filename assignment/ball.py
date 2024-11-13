@@ -3,8 +3,8 @@ sys.path.append("../")
 from utils import bbox_center, measure_distance
 
 class BallAssigner():
-    def __init__(self):
-        self.distance = 70
+    def __init__(self, config):
+        self.distance = config["min_distance_to_assign_ball"]
 
     def assign_ball(self, players, bbox):
         
