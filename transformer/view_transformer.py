@@ -2,10 +2,10 @@ import numpy as np
 import cv2
 
 class ViewTransformer:
-    def __init__(self):
+    def __init__(self, config):
 
-        court_width = 68
-        court_length = 105
+        court_width = config["court_width"]
+        court_length = config["court_length"]
 
         # Trapezoid (in video) vertices
         self.pixel_vertices = np.array([
