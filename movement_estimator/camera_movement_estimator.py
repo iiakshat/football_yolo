@@ -80,10 +80,10 @@ class CameraMovementEstimator:
 
         return movement
 
-    def draw_movement(self, frames, movement_per_frame):
+    def draw_movement(self, frames, movement_per_frame, config):
 
         output = []
-        alpha = 0.6
+        alpha = config["alpha"]
         for frame_num, frame in enumerate(frames):
             overlay = frame.copy()
             frame = frame.copy()

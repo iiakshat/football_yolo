@@ -4,9 +4,9 @@ from utils import *
 
 class SpeedDistanceEstimator:
 
-    def __init__(self):
+    def __init__(self, config):
         self.batch_size = 5
-        self.frame_rate = 24
+        self.frame_rate = config["frame_rate"]
 
     def estimate_dist_and_speed(self, tracks):
         
@@ -48,9 +48,12 @@ class SpeedDistanceEstimator:
                         tracks[object][batch][track_id]["speed"] = speedKmPH
                         tracks[object][batch][track_id]["distance"] = total_distance[object][track_id]
 
-    def draw_annotations(self, frames, tracks):
-        op_frames = []
+    def draw_annotations(self, frames, tracks, showspeed, showdistance, speedcolour):
 
+        if not showspeed and not showdistance:
+            return frames
+        
+        op_frames = []
         for i, frame in enumerate(frames):
             for object, object_track in tracks.items():
                 if object == "ball" or object == "referees":
@@ -70,8 +73,10 @@ class SpeedDistanceEstimator:
                         position[1] += 40
 
                         position = tuple(map(int, position))
-                        cv2.putText(frame, f"{speed:.2f}km/h", position, cv2.FONT_HERSHEY_DUPLEX, 0.6, (0,0,0), 2)
-                        cv2.putText(frame, f"{distance:.2f}m", (position[0], position[1]+25), cv2.FONT_HERSHEY_DUPLEX, 0.5, tuple(map(int, track_details.get("jersey_colour", (0,0,0)))), 1)
+                        if showspeed:
+                            cv2.putText(frame, f"{speed:.2f}km/h", position, cv2.FONT_HERSHEY_DUPLEX, 0.6, speedcolour, 2)
+                        if showdistance:
+                            cv2.putText(frame, f"{distance:.2f}m", (position[0], position[1]+25), cv2.FONT_HERSHEY_DUPLEX, 0.5, tuple(map(int, track_details.get("jersey_colour", (0,0,0)))), 1)
 
             op_frames.append(frame)
         return op_frames
