@@ -102,10 +102,13 @@ class Tracker:
         return frame
 
 
-    def draw_annotations(self, frames, tracks, team_ball_control):
+    def draw_annotations(self, frames, tracks, team_ball_control, 
+                         showteamcontrol, pointplayerwithball, showplayeridwithball, pointercolour):
 
-        op_frames = []
+        if not showteamcontrol and not pointplayerwithball and not showplayeridwithball:
+            return frames
         
+        op_frames = []
         # Draw frame by frame
         for i, frame in enumerate(frames):
             frame = frame.copy()
@@ -120,10 +123,12 @@ class Tracker:
                 frame = self.ellipse(frame, player["bbox"], color, track_id)
 
                 if player.get("has_ball", False):
-                    frame = self.player_with_ball(frame, track_id)
-                    frame = self.triangle(frame, player["bbox"],(0,0,255))
+                    frame = self.player_with_ball(frame, track_id, showplayeridwithball)
+
+                    if pointplayerwithball:
+                        frame = self.triangle(frame, player["bbox"],pointercolour)
                 else:
-                    frame = self.player_with_ball(frame, None)
+                    frame = self.player_with_ball(frame, None, showplayeridwithball)
 
             # Draw Referee
             for _, referee in referees.items():
@@ -134,7 +139,8 @@ class Tracker:
                 frame = self.triangle(frame, ball_["bbox"],(0,255,0))
 
             # Team Control
-            frame = self.team_control(frame, i, team_ball_control)
+            if showteamcontrol:
+                frame = self.team_control(frame, i, team_ball_control)
             op_frames.append(frame)
 
         return op_frames
@@ -224,8 +230,11 @@ class Tracker:
         return frame
     
 
-    def player_with_ball(self, frame, trackid):
+    def player_with_ball(self, frame, trackid, show=True):
 
+        if not show:
+            return frame
+        
         if trackid is None:
             text = " No one has the ball."
         else:
