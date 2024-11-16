@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Football Analysis using YOLO</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+<link rel="stylesheet" type="text/css" href="../static/css/index.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Kirang+Haerang&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Alkatra:wght@400..700&display=swap" rel="stylesheet">
+<script>
+	function checkStatus() {
+		fetch('/status')
+			.then(response => response.json())
+			.then(data => {
+				if (data.status === 'done') {
+					window.location.href = '/final';
+				} else {
+					setTimeout(checkStatus, 1000); // Retry after 1 second
+				}
+			})
+			.catch(error => console.error('Error:', error));
+	}
+
+	window.onload = function() {
+		checkStatus();
+	};
+</script>
+</head>
+<body style="margin-top: 10%; color: white;">
+<h2 >Please wait.. Your video is being processed.</h2>
+{% if filename %}
+	<div style="margin: 10px auto;">
+		Loading.. {{filename}}
+		<video autoplay="autoplay" controls="controls" preload="preload">
+			<source src="{{ url_for('static', filename=filename) }}" type="video/mp4"></source>
+			<source src="{{ url_for('static', filename=filename) }}" type="video/avi"></source>
+			<source src="{{ url_for('static', filename=filename) }}" type="video/ogg"></source>
+			<source src="{{ url_for('static', filename=filename) }}" type="video/webm"></source>
+		</video>
+	</div>
+{% endif %}
+</body>
+</html>
