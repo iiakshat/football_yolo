@@ -86,9 +86,6 @@ def process(config):
     save_video(output_video, output_path)
     # print(f"Time: {time.perf_counter() - s}")
 
-def process2(config):
-    time.sleep(3)
-    
 if __name__ == '__main__':
 
     config_path = "config.json"

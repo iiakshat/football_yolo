@@ -2,7 +2,7 @@ import os
 import json
 import time
 import threading
-from main import process2
+from main import process
 from flask import Flask, request, redirect, url_for, render_template, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 
@@ -51,7 +51,7 @@ def process_video(filename, config):
                 config.pop(val)
 
     configog.update(config)
-    process2(configog)
+    process(configog)
     processing_status['status'] = 'done'
 
 def clearfiles():
